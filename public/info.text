@@ -1,0 +1,246 @@
+Creo el proyect nuevo desde la terminal.
+
+----------------------------------------------------------------------------------
+Dentro de AppServiceProvider en el metodo boot agrego la siguiente linea de codigo.
+Debo importar el use arriba.
+
+use Illuminate\Support\Facades\Schema;
+
+public function boot()
+{
+    Schema::defaultStringLength(191);
+}
+----------------------------------------------------------------------------------
+Creo sistema de login (auth): 
+	php artisan make:auth
+Luego
+	php artisan migrate
+----------------------------------------------------------------------------------
+Creo los Middleware para poder trabajar con distintas sesiones.
+
+	php artisan make:middleware usuarioMedico
+
+Esto me crea un middleware dentro de la carpeta app/http/middleware
+Debo modificar ese archivo...entrar y ver.
+Luego debo agregar en app/http/kernel.php el nuevo middleware en el metodo routeMiddleware
+	
+	'medico' => \App\Http\Middleware\Medico::class,
+	
+debo crear una carpeta de fotos con el nombre mail del medico. con lo que esta antes del @
+
+insert into modulos (id, descripcion) values (1, 'vacunas_tabla');
+insert into modulos (id, descripcion) values (2, 'vacunas_sin_tabla');
+
+insert into vacunas (nombre, cantidad_dosis, activo) values ('BCG', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Hepatitis B', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Neumococo Conjugada', 3, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Quintuple Pentavalente DTP-HB-Hib', 3, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Polio IPV', 2, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Polio OPV', 3, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Rotavirus', 2, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Meningococo', 4, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Gripe', 0, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Hepatitis A', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Triple Viral', 3, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Varicela', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Cuadruple o Quintuple Pentavalente DTP-Hib', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Triple Bacteriana Celular DTP', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Triple Bacteriana Acelular dTpa', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Virus Papiloma Humano VPH', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Doble Bacteriana dT', 0, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Doble Viral SR o Triple Viral SRP', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Fiebre Amarilla FA', 2, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Fiebre Hemorragica Argentina', 1, 1);
+insert into vacunas (nombre, cantidad_dosis, activo) values ('Otras', 1, 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Motor Grueso', 'Reflejos de búsqueda y succión', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Motor Grueso', 'Moro', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Motor Grueso', 'Posicion esgrimista', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Motor Grueso', 'Reflejo de marcha', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Motor Fino', 'Prension palmar refleja', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Psicosocial', 'Fijacion ocular', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Psicosocial', 'Sonrisa refleja', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Lenguaje', 'Responde al sonido', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Lenguaje', 'Gira la cabeza', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Motor Grueso', 'Reflejos de búsqueda y succión', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Motor Grueso', 'Moro', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Motor Grueso', 'Posicion esgrimista no determinante', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Motor Grueso', 'Angulo popliteo de 90°', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Motor Fino', 'Prension palmar refleja', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Psicosocial', 'Fijacion y seguimiento ocular', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Psicosocial', 'Sonrisa refleja', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Psicosocial', 'Se calma al hablarle y alzarlo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Lenguaje', 'Responde al sonido y a voces conocidas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (1, 'Lenguaje', 'Gira la cabeza', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Motor Grueso', 'Reflejos de succión dormido', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Motor Grueso', 'Moro', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Motor Grueso', 'Posicion esgrimista no determinante', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Motor Grueso', 'Angulo popliteo de 90°', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Motor Fino', 'Prension palmar refleja', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Motor Fino', 'Manos abiertas en vigilia', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Psicosocial', 'Sonrisa social', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Psicosocial', 'Se calma al hablarle y alzarlo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Lenguaje', 'Responde al sonido y a voces conocidas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Lenguaje', 'Gira la cabeza', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (2, 'Lenguaje', 'Inicia vocalizaciones: hace eco al que habla', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (0, 'Observacion', 'Observacion', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Motor Grueso', 'Moro atenuado', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Motor Grueso', 'Cara en línea media', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Motor Grueso', 'Sostén cefálico en posición sentada', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Motor Grueso', 'Angulo poplíteo de 90°', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Motor Fino', 'Manos abiertas en vigilia', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Motor Fino', 'Puede sostener sonajero', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Psicosocial', 'Sonrisa social', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Psicosocial', 'Se calma al hablarle y alzarlo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Psicosocial', 'Se comunican a través de movimientos corporales', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Psicosocial', 'Algunos ríen a carcajada', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Lenguaje', 'Responde al sonido y a voces conocidas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (3, 'Lenguaje', 'Con el displacer grita o llora', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Motor Grueso', 'Moro atenuado', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Motor Grueso', 'Cara y manos en línea media', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Motor Grueso', 'Sostiene firmemente la cabeza', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Motor Grueso', 'Balconeo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Motor Fino', 'Manos abiertas en vigilia', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Motor Fino', 'Mira las manos y las lleva a la boca', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Motor Fino', 'Puede sostener sonajero', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Motor Fino', 'Prensión palmar voluntaria', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Psicosocial', 'Se ríe a carcajadas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Psicosocial', 'Prefiere a sus padres', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Psicosocial', 'Elije compañía', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Lenguaje', 'Detiene el llanto cuando se le habla', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Lenguaje', 'Hace eco del que habla', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (4, 'Lenguaje', 'Vocaliza cuando el adulto se calla', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Motor Grueso', 'Trípode Balconeo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Motor Fino', 'Junta manos en la línea media y las lleva a la boca', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Motor Fino', 'Aproximación al objeto usando la mano como un rastrillo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Motor Fino', 'Pasa objetos de una mano a la otra', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Psicosocial', 'Se ríe a carcajadas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Psicosocial', 'Prefiere a sus padres', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Psicosocial', 'Elije compañía', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Psicosocial', 'Le gusta mirarse en el espejo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Lenguaje', 'Detiene el llanto cuando se le habla', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Lenguaje', 'Da matices a su llanto y gorjeos comunicando sus emociones', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Lenguaje', 'Vocaliza en respuesta', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (5, 'Lenguaje', 'Balbuceo', 1);
+
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Motor Grueso', 'Trípode', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Motor Grueso', 'Rola', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Motor Grueso', 'Sin reflejo de Moro', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Motor Fino', 'Prensión dígito palmar', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Motor Fino', 'Pasa objetos de una mano a la otra', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Psicosocial', 'Empieza ansiedad ante extraños', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Psicosocial', 'Se irrita si no se cumple su voluntad', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Psicosocial', 'Le gusta mirarse en el espejo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Lenguaje', 'Comienza a utilizar consonantes en sus sílabas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (6, 'Lenguaje', 'Comienza a imitar sonidos del lenguaje', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Motor Grueso', 'Se sienta sin apoyo el 80% a los 8 meses', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Motor Grueso', 'Puede reptar o gatear', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Motor Fino', 'Comienza pinza radial inferior', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Motor Fino', 'Prensión en tijeras', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Psicosocial', 'Ansiedad de separación', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Psicosocial', 'Juega a las escondidas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Psicosocial', 'Llora ante extraños', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Psicosocial', 'Se irrita si no se cumple su voluntad', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Psicosocial', 'Disfruta del espejo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Lenguaje', 'Silabeo no específico', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Lenguaje', 'Entiende al no', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Lenguaje', 'Comienza a reconocer su nombre', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (7, 'Lenguaje', 'Diferentes matices al llanto', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Motor Grueso', 'Gatea, camina con apoyo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Motor Grueso', 'Se para solo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Motor Fino', 'Pinza digital inferior', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Psicosocial', 'Ansiedad de separación', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Psicosocial', 'Aplaude', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Psicosocial', 'Puede comer con la mano', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Psicosocial', 'Tira un juguete y espera que lo recojan', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Psicosocial', 'Saluda con la mano', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Lenguaje', 'Mamá y Papá', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Lenguaje', 'Respuesta al no', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Lenguaje', 'Comprende preguntas y ordenes sencillas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (9, 'Lenguaje', 'Primeras palabras con sentido', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Motor Grueso', 'Gatea, camina con apoyo o da pasos solo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Motor Grueso', 'Se para solo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Motor Fino', 'Pinza digital superior', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Motor Fino', 'Pinza fina', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Motor Fino', 'Señala con el dedo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Motor Fino', '75% entrega objeto', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Psicosocial', 'Imita acciones', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Psicosocial', 'Viene cuando se lo llama', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Psicosocial', 'Saluda con la mano', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Psicosocial', 'Busca objetos escondidos', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Lenguaje', '35% dice palabra frase', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Lenguaje', 'Jerigonza inmadura', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Lenguaje', 'Comprende ordenes simples', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Lenguaje', 'Respuesta al no', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Lenguaje', 'Comprende preguntas y órdenes sencillas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (12, 'Lenguaje', 'Primeras palabras con sentido', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Motor Grueso', 'Camina solo, se agacha y se levanta sin sostén', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Motor Grueso', 'Patea la pelota', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Motor Grueso', 'Se sube a la silla sin ayuda', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Motor Grueso', 'Gatea escaleras arriba', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Motor Fino', 'Primeros garabatos', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Motor Fino', 'Bebe de la taza', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Motor Fino', 'Come solo (no con cubiertos)', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Motor Fino', 'Trasvasa líquidos', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Psicosocial', 'Comprende función de los objetos', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Psicosocial', 'Imita tareas del hogar', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Psicosocial', 'Tiene juego simbólico (75%)', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Psicosocial', 'Prueba límites de los padres', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Lenguaje', 'Dice 4 a 6 palabras sueltas', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Lenguaje', 'Palabra frase', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Lenguaje', 'Jerga gestual', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Lenguaje', 'Imita cantos', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (15, 'Lenguaje', 'Comprende órdenes simples', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Grueso', 'Camina solo, se agacha y se levanta sin sostén', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Grueso', 'Camina, trepa (90%)', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Grueso', 'Sube escaleras con apoyo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Grueso', 'Patea pelota', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Grueso', 'Arrastra juguete', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Fino', 'Garabato', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Fino', 'Imita trazo vertical', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Fino', 'Usa tenedor', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Fino', 'Usa taza', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Motor Fino', 'Torre 2 cubos', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Psicosocial', 'Juego simbólico (80%)', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Psicosocial', 'Acude al llamado del otro (75%)', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Psicosocial', 'Imita a los padres en tareas habituales', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Lenguaje', 'Dice 10 a 15 palabras', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Lenguaje', 'Dice no', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Lenguaje', 'Comprende órdenes simples', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (18, 'Lenguaje', 'Palabra frase-rudimentaria', 1);
+
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Grueso', 'Camina solo, se agacha y se levanta sin sostén', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Grueso', 'Corre', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Grueso', 'Sube y baja escaleras con dos pies con ayuda', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Grueso', 'Trepa', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Grueso', 'Lanza pelota', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Fino', 'Torre de 6 cubos', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Fino', 'Usa cuchara y tenedor', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Fino', 'Sostiene taza', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Fino', 'Dibuja línea vertical y círculo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Motor Fino', 'Garabato', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Psicosocial', 'Controla esfínteres diurno (50%)', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Psicosocial', 'Reconoce su sexo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Psicosocial', 'Colabora al vestirse y a cepillarse los dientes', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Psicosocial', 'Juego en paralelo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Psicosocial', 'Juego simbólico hacia un muñeco', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Lenguaje', 'Cumple órdenes de dos pasos', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Lenguaje', 'Aparece el yo, mi y mío', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Lenguaje', 'Frase de dos palabras (sujeto y acción)', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Lenguaje', 'Arriba/abajo', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Lenguaje', 'Delante/detrás', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Lenguaje', 'Concepto de 2', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Lenguaje', 'Dice su nombre y edad', 1);
+insert into desarrollo_madurativos (mes, tipo, descripcion,activo) values (24, 'Lenguaje', 'Habla mientras juega', 1);

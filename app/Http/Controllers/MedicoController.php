@@ -2741,15 +2741,21 @@ class MedicoController extends Controller
 
     function cargarDesarrolloMadurativoConsulta(Request $request){
         $consulta_id = $request->consulta;
-        $tablaAux = DB::table('desarrollo_madurativo_pacientes')
-                        ->where('desarrollo_madurativo_pacientes.consulta_id', $consulta_id)                        
+        // La sección se muestra si la consulta tiene al menos un hito marcado o una observación
+        // escrita. Antes exigía más de una fila, así que un solo hito cargado dejaba la tabla
+        // invisible; y leía la primera fila sin comprobar que hubiera alguna.
+        $filas = DB::table('desarrollo_madurativo_pacientes')
+                        ->where('desarrollo_madurativo_pacientes.consulta_id', $consulta_id)
                         ->where('desarrollo_madurativo_pacientes.activo', 1)
-                        ->get(); 
+                        ->get();
         $response = 0;
-        if($tablaAux != null) 
-            if($tablaAux->count()>1 || strcmp($tablaAux[0]->observacion, '') != 0)  
+        foreach ($filas as $fila) {
+            if ((int) $fila->checked === 1 || strcmp((string) $fila->observacion, '') != 0) {
                 $response = 1;
-        return response()->json(array('response'=>$response));                   
+                break;
+            }
+        }
+        return response()->json(array('response'=>$response));
     }
 
     function cargarDesarrolloMadurativoObservacion(Request $request){

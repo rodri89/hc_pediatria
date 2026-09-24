@@ -191,17 +191,17 @@
 		if(edad_aux[1] != 0){
 			edad = edad + parseInt(edad_aux[1]);
 		}
-		if(edad == 8)
-			edad = 7;
-		if(edad == 10 || edad == 11)
-			edad = 9;
-		if(edad == 13 || edad == 14)
-			edad = 12;
-		if(edad == 16 || edad == 17)
-			edad = 15;
-		if(edad > 18 && edad < 24 )
-			edad = 18;
-		
+		// Tramo de edad del catálogo: el mayor que no supere la edad del paciente. Antes era una
+		// cadena de ifs que cubría hasta los 23 meses, así que a los 25 o más no encontraba ninguno
+		// y la tabla salía vacía. Es la misma regla que usa Salud 360.
+		var tramos = [0, 1, 2, 3, 4, 5, 6, 7, 9, 12, 15, 18, 24];
+		var tramo = tramos[0];
+		for (var i = 0; i < tramos.length; i++) {
+			if (tramos[i] <= edad)
+				tramo = tramos[i];
+		}
+		edad = tramo;
+
 		return edad;
 	}
 

@@ -1,3 +1,5 @@
+| `app/Http/Controllers/Api/Salud360/*` | `Auth`, `Paciente`, `Consulta`, `Foto` || `app/Services/Salud360/RegistrosService.php` | Las cuatro listas: exámenes complementarios, interconsultas, screenings e internaciones |
+| `app/Services/Salud360/FotosService.php` | Las galerías de fotos y archivos adjuntos |
 # API Salud 360 — Historia clínica de pediatría
 
 API REST que consume la app **Salud 360** para leer y escribir **la misma base que la web de pediatría**.
@@ -39,9 +41,11 @@ del administrador, en vez de un fallo mudo.
 | `app/Services/Salud360/TobbAuthService.php` | Valida el token contra turnosonlinebb, cachea la sesión y resuelve el médico local |
 | `app/Services/Salud360/PacienteVinculoService.php` | Decide a qué paciente de pediatría corresponde el de la app |
 | `app/Services/Salud360/SeccionesService.php` | Traduce el modelo genérico de la app a las tablas de pediatría |
+| `app/Services/Salud360/RegistrosService.php` | Las cuatro listas: exámenes complementarios, interconsultas, screenings e internaciones |
+| `app/Services/Salud360/FotosService.php` | Las galerías de fotos y archivos adjuntos |
 | `app/Http/Middleware/Salud360Api.php` | Autenticación (alias `salud360`) |
 | `app/Http/Middleware/Salud360Cors.php` | CORS global, contesta el preflight |
-| `app/Http/Controllers/Api/Salud360/*` | `Auth`, `Paciente`, `Consulta` |
+| `app/Http/Controllers/Api/Salud360/*` | `Auth`, `Paciente`, `Consulta`, `Foto` |
 | `config/salud360.php` | URL de turnos, caché, gracia, autoprovisión |
 
 Las tablas `salud360_token_cache`, `salud360_vinculos_pendientes` y la columna `pacientes.paciente_id_tobb`
@@ -106,6 +110,52 @@ reintento de la app tras quedarse sin señal no genera duplicados.
 
 Una sección ausente en el cuerpo **no se toca**, para que la app mande solo lo que cambió. Las desconocidas
 se ignoran y se informan en `desconocidas`, para que la app no las dé por guardadas.
+
+### Fotos y archivos adjuntos
+
+| Método | Ruta | Cuerpo / Query |
+|---|---|---|
+| GET | `consultas/{id}/fotos` | |
+| POST | `consultas/{id}/fotos` | **multiparte**: `tipo`, `ref`, `[padre_id]`, `archivo` |
+| GET | `fotos/{tipo}/{id}/archivo` | `consulta_id` |
+| DELETE | `fotos/{tipo}/{id}` | `consulta_id` |
+
+`tipo` dice a qué galería va, y cada una es una tabla distinta de pediatría:
+
+| `tipo` | Tabla | Cuelga de |
+|---|---|---|
+| `consulta` | `consulta_fotos` | la consulta |
+| `neonatales` | `antecedentes_neonatales_fotos` | la ficha de antecedentes neonatales del paciente |
+| `examen_complementario` | `examenes_complementarios_fotos` | la fila de la lista, que va en `padre_id` |
+| `internacion` | `internaciones_fotos` | la fila de la lista, que va en `padre_id` |
+| `familigrama` | `familigramas` | el paciente |
+
+Cinco cosas para entenderlas:
+
+- **Un archivo por pedido.** El médico saca la foto en el consultorio, donde la señal es mala; si se
+  corta a la mitad se reintenta esa sola y no las diez de la consulta. La respuesta trae
+  `{ok, id, ids: {ref => id}, url}`: `ref` es el id que el archivo tiene en el dispositivo, e `id` con
+  el que quedó acá. **Sin ese par, el segundo envío sube la misma foto de nuevo.**
+- **Los dos que cuelgan de una lista necesitan `padre_id`**, que es el id de la fila en pediatría, el
+  que devolvió `consultas/{id}/registros`. Si falta o no es de ese paciente: `422 padre_no_encontrado`.
+- **Se aceptan imágenes y PDF**, hasta 12 MB (`422 tipo_de_archivo`, `422 archivo_grande`). Las
+  imágenes se achican a 1980×1920 **conservando la proporción**, y nunca se agrandan. La web llama a
+  `resize(1980, 1920)` a secas, que deforma; acá no. Los PDF se guardan tal cual: la app los deja
+  adjuntar y la web todavía no los muestra.
+- **El archivo va a `public/img/<usuario>/<carpeta>/`**, donde `<usuario>` es lo que va antes de la
+  arroba del mail del médico, igual que en la web, y la columna `foto` guarda
+  `<usuario>/<carpeta>/<nombre>`, sin el `img/` de adelante. El nombre se sortea: dos madres que
+  mandan `ecografia.jpg` no se pisan. A diferencia de la web, **no** se escribe además una copia en
+  `storage/app` que nadie lee.
+- **Borrar es `activo = 0` y el archivo queda en el disco.** Una foto de una historia clínica no se
+  tira porque alguien tocó el botón equivocado en el teléfono. Es lo que hace hoy la web, que
+  directamente no tiene borrado.
+
+`fotos/{tipo}/{id}/archivo` devuelve el archivo, no JSON, y comprueba que el paciente sea de la cartera
+del médico. Se expone porque `public/img/` lo abre cualquiera que tenga el enlace, y la app ya manda el
+token en cada pedido. La URL pública igual viene en `url`, porque es la que usa la web. Si la fila está
+pero el archivo no —pasa con fotos viejas subidas a otro hosting—: `404 archivo_ausente`, con la `url`
+para que la app no lo confunda con un error de red.
 
 ### Mapeo
 
@@ -202,5 +252,7 @@ cacheada no incluye archivos nuevos.
 - **Fase 2: terminada.** Andan las secciones de texto, el examen físico, los formularios
   (alimentación, antecedentes perinatales y neonatales, antecedentes personales y familiares y las
   tres de la consulta prenatal), el desarrollo madurativo y las cuatro listas.
-- **Fase 3:** fotos y archivos adjuntos.
+- **Fase 3: terminada.** Andan las fotos y los archivos adjuntos de las cinco galerías.
+- **Falta de la fase 3:** las vacunas en grilla siguen como texto libre, y los PDF se guardan pero la
+  web todavía no los muestra.
 - **Fase 4:** pendientes, secretarias y aviso de edición simultánea.

@@ -75,14 +75,4 @@ class PacienteController extends Salud360Controller
         }
         return $this->ok(['paciente' => $this->formatearPaciente($paciente)]);
     }
-
-    /** El médico solo ve pacientes de su cartera, igual que en la web. */
-    private function atiende($medicoUserId, $pacienteId)
-    {
-        return DB::table('medico_pacientes')
-            ->where('medico_user_id', $medicoUserId)
-            ->where('paciente_id', $pacienteId)
-            ->where('activo', 1)
-            ->exists();
-    }
 }

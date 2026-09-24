@@ -249,49 +249,6 @@ class ConsultaController extends Salud360Controller
     // Apoyo
     // ------------------------------------------------------------------
 
-    /** Consulta que el médico puede leer: de un paciente de su cartera. */
-    private function consultaVisible($medico, $id)
-    {
-        $consulta = DB::table('consultas')->where('id', (int) $id)->first();
-        if ($consulta === null || (int) $consulta->activo === self::CONSULTA_BORRADA) {
-            return $this->error('Consulta no encontrada.', 404, 'no_encontrado');
-        }
-        if (!$this->atiende($medico->id, $consulta->paciente_id)) {
-            return $this->error('Esa consulta no es de un paciente de tu listado.', 403, 'sin_permiso');
-        }
-        return $consulta;
-    }
-
-    /**
-     * Consulta que el médico puede escribir: además, propia.
-     * Devuelve la fila, o una respuesta de error ya armada. Quien llama debe comprobar
-     * `instanceof JsonResponse`: un `is_object()` no alcanza, porque la respuesta también es un objeto.
-     */
-    private function consultaPropia($medico, $id)
-    {
-        $consulta = $this->consultaVisible($medico, $id);
-        if ($consulta instanceof JsonResponse) {
-            return $consulta;
-        }
-        if ((int) $consulta->medico_id !== (int) $medico->id) {
-            return $this->error('Esa consulta la cargó otro médico.', 403, 'consulta_ajena');
-        }
-        return $consulta;
-    }
-
-    private function atiende($medicoUserId, $pacienteId)
-    {
-        return DB::table('medico_pacientes')
-            ->where('medico_user_id', $medicoUserId)
-            ->where('paciente_id', $pacienteId)
-            ->where('activo', 1)
-            ->exists();
-    }
-
-    private function marcarActualizada($consultaId)
-    {
-        DB::table('consultas')->where('id', $consultaId)->update(['updated_at' => Carbon::now()]);
-    }
 
     private function nombreMedico($medicoId)
     {

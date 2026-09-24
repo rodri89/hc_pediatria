@@ -41,5 +41,12 @@ Route::group(['prefix' => 'salud360', 'namespace' => 'Api\Salud360', 'middleware
     Route::put('consultas/{id}/registros', 'ConsultaController@guardarRegistros');
     Route::post('consultas/{id}/cerrar', 'ConsultaController@cerrar');
     Route::post('consultas/{id}/reabrir', 'ConsultaController@reabrir');
+
+    // Fotos y archivos adjuntos. Uno por pedido y en multiparte; el borrado es baja lógica.
+    Route::get('consultas/{id}/fotos', 'FotoController@index');
+    Route::post('consultas/{id}/fotos', 'FotoController@store');
+    Route::get('fotos/{tipo}/{id}/archivo', 'FotoController@archivo');
+    Route::delete('fotos/{tipo}/{id}', 'FotoController@destroy');
+
     Route::delete('consultas/{id}', 'ConsultaController@destroy');
 });

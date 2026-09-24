@@ -15,6 +15,8 @@ class Kernel extends HttpKernel
      */
     protected $middleware = [
         \App\Http\Middleware\TrustProxies::class,
+        // Va primero para contestar el preflight OPTIONS de /api/salud360, que Laravel responde antes de las rutas.
+        \App\Http\Middleware\Salud360Cors::class,
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
@@ -63,6 +65,7 @@ class Kernel extends HttpKernel
         'usuarioMedico' => \App\Http\Middleware\usuarioMedico::class,
         'usuarioAdmin' => \App\Http\Middleware\usuarioAdmin::class,
         'usuarioSecretaria' => \App\Http\Middleware\usuarioSecretaria::class,
+        'salud360' => \App\Http\Middleware\Salud360Api::class,
     ];
 
     /**

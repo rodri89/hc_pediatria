@@ -80,7 +80,6 @@ class FotoController extends Salud360Controller
         $r = $this->fotos->guardar(
             $consulta->id,
             $consulta->paciente_id,
-            $medico,
             $tipo,
             $archivo,
             (int) $request->input('padre_id')
@@ -150,6 +149,13 @@ class FotoController extends Salud360Controller
                 return $this->error('Solo se aceptan imágenes y PDF.', 422, 'tipo_de_archivo');
             case 'padre_no_encontrado':
                 return $this->error('No se encontró la fila a la que se adjunta.', 422, 'padre_no_encontrado');
+            case 'carpeta_no_escribible':
+                // El hosting compartido no deja crear directorios: la carpeta se crea una vez, a mano.
+                return $this->error(
+                    'Falta la carpeta public/img/' . FotosService::CARPETA . ' en el servidor, o no tiene permiso de escritura.',
+                    500,
+                    'carpeta_no_escribible'
+                );
             default:
                 return $this->error('No se pudo guardar el archivo.', 500, 'no_se_pudo_guardar');
         }

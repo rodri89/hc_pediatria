@@ -224,7 +224,33 @@ class FotosService
     /** Dónde quedó el archivo en el disco, para servirlo por la API en vez de por URL pública. */
     public function rutaEnDisco($relativa)
     {
-        return public_path('img/' . $relativa);
+        return $this->baseDeImagenes() . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativa);
+    }
+
+    /**
+     * Carpeta `img` que sirve el servidor web, en el disco.
+     *
+     * No alcanza con `public_path()`. En un hosting donde el contenido del `public` de Laravel se
+     * copia dentro del `public_html` del dominio, `public_path()` apunta a una carpeta que el
+     * servidor no publica, o que directamente no existe. La web no se entera porque guarda con rutas
+     * **relativas** (`Image::save('img/…')`), que caen en el directorio del script, o sea el que se
+     * publica. Acá se resuelve igual, y se puede forzar con `SALUD360_IMG_PATH` si hiciera falta.
+     */
+    public function baseDeImagenes()
+    {
+        $forzada = trim((string) config('salud360.img_path'));
+        if ($forzada !== '') {
+            return rtrim($forzada, '/\\');
+        }
+        // El directorio del `index.php` que atendió el pedido: es el que el servidor publica.
+        $script = (string) filter_input(INPUT_SERVER, 'SCRIPT_FILENAME');
+        if ($script !== '' && is_file($script)) {
+            $candidato = dirname($script) . DIRECTORY_SEPARATOR . 'img';
+            if (is_dir($candidato)) {
+                return $candidato;
+            }
+        }
+        return public_path('img');
     }
 
     /** La URL absoluta con la que lo sirve la web de pediatría. */
@@ -301,8 +327,17 @@ class FotosService
         return $propias;
     }
 
+    /** Última carpeta que se intentó escribir, para poder nombrarla en el error. */
+    private $ultimoDestino = '';
+
+    public function ultimoDestino()
+    {
+        return $this->ultimoDestino;
+    }
+
     /**
-     * Deja el archivo en `public/img/salud360/` y devuelve lo que va en la columna.
+     * Deja el archivo en la carpeta [CARPETA] dentro del `img` que publica el servidor, y devuelve lo
+     * que va en la columna. Ver [baseDeImagenes] sobre por qué no alcanza con `public_path()`.
      *
      * **Una sola carpeta para todos, sin subcarpetas.** La web usa una por médico y otra por sección,
      * y las crea a mano: su código no crea ninguna, asume que están. En este hosting el PHP no tiene
@@ -316,7 +351,8 @@ class FotosService
      */
     private function escribirEnDisco(array $def, UploadedFile $archivo, $mime)
     {
-        $destino = public_path('img/' . self::CARPETA);
+        $destino = $this->baseDeImagenes() . DIRECTORY_SEPARATOR . self::CARPETA;
+        $this->ultimoDestino = $destino;
         if (!is_dir($destino)) {
             // Se intenta igual, por si el hosting lo permite. La arroba evita que el aviso de PHP
             // se cuele en la respuesta; si no se pudo, lo dice el código de error.

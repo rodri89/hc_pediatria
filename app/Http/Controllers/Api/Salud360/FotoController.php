@@ -150,11 +150,14 @@ class FotoController extends Salud360Controller
             case 'padre_no_encontrado':
                 return $this->error('No se encontró la fila a la que se adjunta.', 422, 'padre_no_encontrado');
             case 'carpeta_no_escribible':
-                // El hosting compartido no deja crear directorios: la carpeta se crea una vez, a mano.
+                // Se nombra la ruta exacta: el problema real suele ser que PHP mira otra carpeta que
+                // la que uno creó, no los permisos. Se puede forzar con SALUD360_IMG_PATH.
                 return $this->error(
-                    'Falta la carpeta public/img/' . FotosService::CARPETA . ' en el servidor, o no tiene permiso de escritura.',
+                    'No se pudo escribir en "' . $this->fotos->ultimoDestino() . '". Creála con permiso de '
+                        . 'escritura, o indicá la carpeta correcta en SALUD360_IMG_PATH.',
                     500,
-                    'carpeta_no_escribible'
+                    'carpeta_no_escribible',
+                    ['carpeta' => $this->fotos->ultimoDestino()]
                 );
             default:
                 return $this->error('No se pudo guardar el archivo.', 500, 'no_se_pudo_guardar');

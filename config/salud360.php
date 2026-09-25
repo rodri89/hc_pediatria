@@ -29,6 +29,13 @@ return [
      */
     'gracia_horas' => (int) env('SALUD360_GRACIA_HORAS', 24),
 
+    /**
+     * Carpeta `img` que publica el servidor web, en el disco. Vacío = se resuelve sola a partir del
+     * `index.php` que atendió el pedido, que es lo que funciona cuando el `public` de Laravel se copia
+     * dentro del `public_html` del dominio y `public_path()` queda apuntando a otro lado.
+     */
+    'img_path' => env('SALUD360_IMG_PATH', ''),
+
     /** Código de esta historia clínica en `salud360_medico_hc` de turnosonlinebb. */
     'hc_codigo' => 'pediatria',
 

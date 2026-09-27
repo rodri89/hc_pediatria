@@ -42,7 +42,8 @@ class RegistrosService
      *
      *   tabla         la de pediatría;
      *   lectura       'consulta' si la lista es la de esta consulta, 'paciente' si es la del paciente
-     *                 entera (así las modela la app);
+     *                 entera, 'acumulativa' si es toda la historia del paciente más lo que se cargó en
+     *                 la consulta abierta (así las modela la app y así las lista la web);
      *   con_consulta  si la tabla lleva `consulta_id` (screenings no);
      *   por_confirmar si nace en `activo = 2` y se confirma al cerrar la consulta;
      *   fecha         columna de fecha, o null si la tabla no tiene;
@@ -54,7 +55,7 @@ class RegistrosService
     const TIPOS = [
         'examen_complementario' => [
             'tabla' => 'examenes_complementarios',
-            'lectura' => 'consulta',
+            'lectura' => 'acumulativa',
             'con_consulta' => true,
             'por_confirmar' => true,
             'fecha' => 'fechaSolicitud',
@@ -64,7 +65,7 @@ class RegistrosService
         ],
         'interconsulta' => [
             'tabla' => 'interconsultas',
-            'lectura' => 'consulta',
+            'lectura' => 'acumulativa',
             'con_consulta' => true,
             'por_confirmar' => true,
             'fecha' => 'fechaSolicitud',
@@ -104,6 +105,13 @@ class RegistrosService
             $q = DB::table($def['tabla'])->where('paciente_id', $pacienteId)->whereIn('activo', [1, 2]);
             if ($def['lectura'] === 'consulta') {
                 $q->where('consulta_id', $consultaId);
+            } elseif ($def['lectura'] === 'acumulativa') {
+                // Como la web: toda la historia del paciente (`activo = 1`) más lo que se cargó en la
+                // consulta abierta, que todavía está en 2. El estudio se pide en una consulta y el
+                // resultado llega semanas después, en otra, así que el médico tiene que verlo igual.
+                $q->where(function ($w) use ($consultaId) {
+                    $w->where('activo', 1)->orWhere('consulta_id', (int) $consultaId);
+                });
             }
             foreach ($q->orderBy('numero')->get() as $fila) {
                 $campos = [];
@@ -111,6 +119,14 @@ class RegistrosService
                     $campos[$campo] = (string) $fila->$columna;
                 }
                 $item = ['id' => (string) $fila->id, 'tipo' => $tipo, 'campos' => $campos];
+                // De qué consulta es cada uno: la app lo necesita para no re-etiquetar como propio de
+                // la consulta abierta un registro que se pidió en otra.
+                if ($def['con_consulta']) {
+                    $item['consulta_id'] = (string) $fila->consulta_id;
+                }
+                if (isset($def['respuesta'])) {
+                    $item['consulta_respuesta'] = (string) $fila->consulta_respuesta;
+                }
                 if ($def['fecha'] !== null) {
                     $fecha = (string) $fila->{$def['fecha']};
                     $item['fecha'] = ($fecha === '' || $fecha === self::SIN_FECHA) ? null : substr($fecha, 0, 10);

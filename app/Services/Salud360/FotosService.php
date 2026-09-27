@@ -179,7 +179,7 @@ class FotosService
             $valores['consulta_id'] = (int) $consultaId;
         }
         if ($def['con_numero']) {
-            $valores['numero'] = $this->proximoNumero($def['tabla'], $pacienteId);
+            $valores['numero'] = $this->proximoNumero($def, $consultaId, $pacienteId, $padre);
         }
         if ($padre !== null) {
             $valores[$this->columnaPadre($def)] = (int) $padre;
@@ -381,10 +381,21 @@ class FotosService
         return self::CARPETA . '/' . $nombre;
     }
 
-    /** Posición dentro del paciente: la que mueven "anterior" y "siguiente" en la web. */
-    private function proximoNumero($tabla, $pacienteId)
+    /**
+     * Posición de la foto: la que mueven "anterior" y "siguiente" en la web, que busca por
+     * `numero` entre 1 y la cantidad de fotos del grupo. El grupo es el mismo que cuenta la web:
+     * las fotos de esa consulta, las de ese examen o internación, o las del paciente
+     * (antecedentes neonatales), y como ella, cantidad + 1. Numerar por paciente deja huecos, y la web
+     * no encuentra la foto.
+     */
+    private function proximoNumero(array $def, $consultaId, $pacienteId, $padre)
     {
-        $max = DB::table($tabla)->where('paciente_id', $pacienteId)->whereIn('activo', [1, 2])->max('numero');
-        return ((int) $max) + 1;
+        $q = DB::table($def['tabla'])->where('paciente_id', (int) $pacienteId)->whereIn('activo', [1, 2]);
+        if (isset($def['cuelga_de_registro'])) {
+            $q->where($def['cuelga_de_registro']['columna'], (int) $padre);
+        } elseif ($def['lectura'] === 'consulta' && $def['con_consulta']) {
+            $q->where('consulta_id', (int) $consultaId);
+        }
+        return $q->count() + 1;
     }
 }

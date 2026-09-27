@@ -3831,9 +3831,11 @@ class MedicoController extends Controller
                                 ->where('desarrollo_madurativo_pacientes.activo', 1)
                                 ->get();   
         $mes = null;
-        if($response != null) {     
+        // get() nunca devuelve null: sin filas (consultas nuevas o creadas desde la app) $response[0] no existe
+        if($response->count() > 0) {
             $dm = DesarrolloMadurativo::find($response[0]->desarrollo_madurativo_id);
-            $mes = $dm->mes;
+            if($dm != null)
+                $mes = $dm->mes;
         }
         return response()->json(array('response'=>1, 'mes'=>$mes));  
     }

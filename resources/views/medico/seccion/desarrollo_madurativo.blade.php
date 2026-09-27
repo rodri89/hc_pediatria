@@ -330,7 +330,9 @@
            data:{consulta:consulta, paciente:paciente, mes:mes,_token: '{{csrf_token()}}'},
            	success:function(data) {              	
            		//var mostrar = 0;                  		
-           		if(data.response == 1 || data.observacion_detalle.observacion.localeCompare('')!= 0){           			           		
+           		// observacion_detalle viene null cuando la consulta no tiene observación cargada (por ejemplo, las que crea la app)
+           		var observacion = (data.observacion_detalle != null && data.observacion_detalle.observacion != null) ? data.observacion_detalle.observacion : '';
+           		if(data.response == 1 || observacion.localeCompare('')!= 0){           			           		
 	           		if(data.mes == -2)
 	           				document.getElementById("desarrollo_madurativo_titulo").innerHTML = "";
 	           		/*if(data.response_data[0].observacion.localeCompare('') != 0 && data.response_data[0].checked == 2){	           			
@@ -340,9 +342,9 @@
 	           			else
 	           				document.getElementById("desarrollo_madurativo_titulo").innerHTML = "Mayor 2 años";
 	           		}	*/           		
-	           		if((data.observacion_detalle != null && data.observacion_detalle.observacion.localeCompare('')!=0) || (opcion == 2)){
+	           		if(observacion.localeCompare('')!=0 || (opcion == 2)){
 	           			document.getElementById("seccion_desarrollo_madurativo_observacion").hidden = false;
-	           			document.getElementById("desarrollo_madurativo_observacion").value = data.observacion_detalle.observacion;	           			
+	           			document.getElementById("desarrollo_madurativo_observacion").value = observacion;	           			
 	           		} else {
 	           			document.getElementById("seccion_desarrollo_madurativo_observacion").hidden = true;
 	           			document.getElementById("desarrollo_madurativo_observacion").value = '';

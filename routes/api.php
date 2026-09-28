@@ -49,4 +49,8 @@ Route::group(['prefix' => 'salud360', 'namespace' => 'Api\Salud360', 'middleware
     Route::delete('fotos/{tipo}/{id}', 'FotoController@destroy');
 
     Route::delete('consultas/{id}', 'ConsultaController@destroy');
+
+    // Licencias de la historia clínica, para el panel de administración. Solo el administrador.
+    Route::get('licencias', 'LicenciaController@index');
+    Route::put('licencias/{medicoIdTobb}', 'LicenciaController@guardar');
 });

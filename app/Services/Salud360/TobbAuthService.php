@@ -34,6 +34,7 @@ class TobbAuthService
     const RECHAZO_HC_NO_HABILITADA = 'hc_no_habilitada';
     const RECHAZO_MEDICO_NO_VINCULADO = 'medico_no_vinculado';
     const RECHAZO_TOBB_CAIDO = 'tobb_caido';
+    const RECHAZO_LICENCIA = 'licencia_vencida';
 
     /** Motivo del último rechazo, para que el middleware arme la respuesta. */
     private $motivo = null;
@@ -43,6 +44,14 @@ class TobbAuthService
 
     /** Perfil de turnosonlinebb de la última validación exitosa. */
     private $perfil = null;
+
+    /** Estado de la licencia del médico que entró, para que la app pueda avisarle que está por vencer. */
+    private $licencia = null;
+
+    public function licencia()
+    {
+        return $this->licencia;
+    }
 
     public function motivo()
     {
@@ -94,7 +103,12 @@ class TobbAuthService
         // 1) Sesión validada hace poco: se reutiliza sin molestar a turnosonlinebb.
         if ($fila !== null && Carbon::parse($fila->expira_en)->isFuture()) {
             $this->perfil = json_decode($fila->perfil_json, true);
-            return $this->usuarioLocal((int) $fila->medico_id_tobb);
+            // Se resuelve por el usuario guardado y no por el número de médico, porque el
+            // administrador no tiene médico y su sesión quedaría sin resolver.
+            $guardado = User::where('id', (int) $fila->user_id)->where('activo', 1)->first();
+            // La licencia se mira también acá, no solo al validar contra turnos: si vence mientras la
+            // sesión está en caché, el médico tiene que dejar de entrar igual.
+            return $this->conLicencia($guardado);
         }
 
         // 2) Se le pregunta a turnosonlinebb.
@@ -110,7 +124,21 @@ class TobbAuthService
     {
         $this->perfil = $perfil;
         $rol = isset($perfil['rol']) ? $perfil['rol'] : '';
-        // Fase 1: solo médicos. Las secretarias entran en una fase posterior.
+
+        // El administrador entra siempre: es el dueño del sistema, no atiende pacientes y no tiene
+        // licencia que pueda vencer. Se lo resuelve al usuario administrador de pediatría.
+        if ($rol === 'admin') {
+            $admin = $this->usuarioAdministrador();
+            if ($admin === null) {
+                $this->motivo = self::RECHAZO_SIN_PERMISO;
+                return null;
+            }
+            $this->guardarEnCache($hash, $admin->id, 0, $perfil);
+            return $admin;
+        }
+
+        // Los médicos, con su historia clínica habilitada y su licencia vigente. Las secretarias
+        // entran en una fase posterior.
         if ($rol !== 'medico' || !isset($perfil['medico']) || !is_array($perfil['medico'])) {
             $this->motivo = self::RECHAZO_SIN_PERMISO;
             return null;
@@ -130,8 +158,55 @@ class TobbAuthService
             $this->extra = ['medico_id_tobb' => $medicoIdTobb];
             return null;
         }
+        $user = $this->conLicencia($user);
+        if ($user === null) {
+            return null;
+        }
         $this->guardarEnCache($hash, $user->id, $medicoIdTobb, $perfil);
         return $user;
+    }
+
+    /**
+     * El médico entra solo si su licencia lo permite, la misma regla que aplica la web al iniciar
+     * sesión (`LoginController::validarLicencia`): vencida o desactivada no entra, y si vence se la
+     * marca inactiva. Dentro de la ventana de aviso entra igual, y se deja constancia en [licencia]
+     * para que la app pueda mostrarle el recordatorio.
+     *
+     * El administrador no tiene licencia y pasa de largo. Sin fila de licencia tampoco entra: la
+     * regla es que la fecha lo habilite, y no haberla cargado no es una fecha que habilite.
+     */
+    private function conLicencia($user)
+    {
+        if ($user === null || (int) $user->usuario_tipo !== 2) {
+            return $user;
+        }
+        $lic = DB::table('medico_licencias')->where('medico_user_id', $user->id)->orderBy('id', 'desc')->first();
+        if ($lic === null) {
+            $this->motivo = self::RECHAZO_LICENCIA;
+            $this->extra = ['licencia' => null];
+            return null;
+        }
+        $hoy = Carbon::now()->toDateString();
+        $vence = substr((string) $lic->fecha_expiracion_licencia, 0, 10);
+        $aviso = substr((string) $lic->fecha_aviso_expiracion, 0, 10);
+        $vencida = $vence < $hoy || (int) $lic->activo === 0;
+        if ($vencida) {
+            // Igual que la web: al detectar el vencimiento se deja la licencia marcada como inactiva.
+            if ((int) $lic->activo === 1) {
+                DB::table('medico_licencias')->where('id', $lic->id)->update(['activo' => 0, 'updated_at' => Carbon::now()]);
+            }
+            $this->motivo = self::RECHAZO_LICENCIA;
+            $this->extra = ['licencia' => ['vence' => $vence, 'vencida' => true]];
+            return null;
+        }
+        $this->licencia = ['vence' => $vence, 'aviso_desde' => $aviso, 'por_vencer' => $aviso <= $hoy];
+        return $user;
+    }
+
+    /** El usuario administrador de pediatría, al que se resuelve el administrador de turnos. */
+    private function usuarioAdministrador()
+    {
+        return User::where('usuario_tipo', 1)->where('activo', 1)->orderBy('id')->first();
     }
 
     /**

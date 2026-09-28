@@ -46,8 +46,11 @@ class Salud360Api
                 return $this->rechazo('El administrador todavía no te habilitó la historia clínica de pediatría.', 403, 'hc_no_habilitada');
             case TobbAuthService::RECHAZO_MEDICO_NO_VINCULADO:
                 return $this->rechazo('Tu usuario de pediatría no está vinculado con turnosonlinebb. Avisale al administrador.', 403, 'medico_no_vinculado', $extra);
+            case TobbAuthService::RECHAZO_LICENCIA:
+                // La misma regla que la web aplica al iniciar sesión: con la licencia vencida no se entra.
+                return $this->rechazo('Tu licencia de la historia clínica está vencida. Avisale al administrador.', 403, 'licencia_vencida', $extra);
             case TobbAuthService::RECHAZO_SIN_PERMISO:
-                return $this->rechazo('Por ahora solo los médicos pueden usar la historia clínica desde la app.', 403, 'sin_permiso');
+                return $this->rechazo('Por ahora solo los médicos y el administrador pueden usar la historia clínica desde la app.', 403, 'sin_permiso');
             case TobbAuthService::RECHAZO_TOBB_CAIDO:
                 return $this->rechazo('No se pudo validar la sesión con turnosonlinebb. Intentá de nuevo en un momento.', 503, 'tobb_caido');
             default:

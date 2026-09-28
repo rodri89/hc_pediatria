@@ -12,7 +12,12 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register(){}
+    public function register()
+    {
+        // Reintenta la conexión cuando el hosting la rechaza por exceso de pedidos simultáneos.
+        // Laravel usa este conector para todas las conexiones con driver mysql.
+        $this->app->bind('db.connector.mysql', \App\Database\ReintentoMySqlConnector::class);
+    }
 
     /**
      * Bootstrap any application services.

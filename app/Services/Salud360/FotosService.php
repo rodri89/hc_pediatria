@@ -73,7 +73,10 @@ class FotosService
      *   tabla          la de pediatría;
      *   carpeta        prefijo del nombre del archivo, con el que la web nombra esa sección;
      *   lectura        'consulta' si la galería es la de esta consulta, 'paciente' si es la del
-     *                  paciente entera (así las modela la app);
+     *                  paciente entera. Va en 'paciente' siempre que la foto cuelgue de una ficha o de
+     *                  un estudio: ahí el vínculo real es el padre y no la consulta, y la web ignora
+     *                  el `consulta_id` de la foto a propósito, porque el resultado de un estudio se
+     *                  sube semanas después de haberlo pedido;
      *   con_consulta   si la tabla lleva `consulta_id` (el familigrama no);
      *   con_numero     si lleva `numero`, la posición que mueven "anterior" y "siguiente";
      *   cuelga_de      sección de cuyo formulario depende por clave foránea;
@@ -98,7 +101,7 @@ class FotosService
         'examen_complementario' => [
             'tabla' => 'examenes_complementarios_fotos',
             'carpeta' => 'examenes_complementarios',
-            'lectura' => 'consulta',
+            'lectura' => 'paciente',
             'con_consulta' => true,
             'con_numero' => true,
             'cuelga_de_registro' => ['tabla' => 'examenes_complementarios', 'columna' => 'examen_complementario_id'],

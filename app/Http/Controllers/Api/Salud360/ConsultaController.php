@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Salud360;
 
+use App\Services\Salud360\FotosService;
 use App\Services\Salud360\RegistrosService;
 use App\Services\Salud360\SeccionesService;
 use Carbon\Carbon;
@@ -25,10 +26,14 @@ class ConsultaController extends Salud360Controller
     /** @var RegistrosService */
     private $registros;
 
-    public function __construct(SeccionesService $secciones, RegistrosService $registros)
+    /** @var FotosService */
+    private $fotos;
+
+    public function __construct(SeccionesService $secciones, RegistrosService $registros, FotosService $fotos)
     {
         $this->secciones = $secciones;
         $this->registros = $registros;
+        $this->fotos = $fotos;
     }
 
     /** GET consultas?paciente_id=&limite= */
@@ -129,6 +134,9 @@ class ConsultaController extends Salud360Controller
             'secciones' => $this->secciones->leer($consulta->id, $consulta->paciente_id),
             'examen_fisico' => $this->secciones->leerExamen($consulta->id, $consulta->paciente_id),
             'registros' => $this->registros->leer($consulta->id, $consulta->paciente_id),
+            // Las fotos van en el mismo pedido: la app las necesita para mostrar lo que ya se subió
+            // desde la web o desde otro dispositivo, y pedirlas aparte serían dos viajes por consulta.
+            'fotos' => $this->fotos->leer($consulta->id, $consulta->paciente_id),
         ]);
     }
 
